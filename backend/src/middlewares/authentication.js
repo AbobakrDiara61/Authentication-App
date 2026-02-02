@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 
+// verify or protectRoute or authentication middleware
 const authentication = (req, res, next) => {
     try {
         const token = req.cookies.token;

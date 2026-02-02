@@ -66,6 +66,9 @@ const login = async (req, res) => {
             if(!isPasswordValid)
                 return res.status(401).json({ message: "Invalid Password" });
             
+            user.lastLoginAt = Date.now();
+            await user.save();
+
             const token = createToken({ name: user.name, email, _id: user._id });
             setCookie(res, token, 'token');
             const refreshToken = createRefreshToken({ name: user.name, email, _id: user._id });
@@ -212,6 +215,22 @@ const resetPassword = async (req, res) => {
     }
 }
 
+const checkAuthentication = async (req, res) => {
+    try {
+        const { _id } = req.user;
+        const user = await User.findById(_id).select('-password');
+        if(!user) 
+            return res.status(404).json({ message: "User Not Found "});
+        if(!user.isVerified)
+            return res.status(401).json({ message: "User is not Verified" });
+        return res.status(200).json({ message: "User is Authenticated", user });
+
+    } catch (error) {
+        console.error("Error in checkAuthentication controller", error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
 const authControllers = {
     signup,
     login,
@@ -219,7 +238,8 @@ const authControllers = {
     deleteAccount,
     sendOTP,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    checkAuthentication
 };
 
 export default authControllers;
