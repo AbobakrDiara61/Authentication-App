@@ -13,9 +13,4 @@ export const sender = {
   email: "hello@demomailtrap.co",
   name: "Mohamed Abobakr",
 };
-const recipients = [
-  {
-    email: "muhammad.batch61@gmail.com",
-  }
-];
 

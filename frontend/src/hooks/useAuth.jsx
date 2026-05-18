@@ -1,0 +1,187 @@
+import { useContext } from 'react'
+import api from '../utils/api'
+import { toast } from 'react-hot-toast'
+import AuthContext from '../context/AuthContext';
+import FormContext from '../context/FormContext';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+
+// We can make it for all requests
+// axios.defaults.withCredentials = true; 
+
+const useAuth = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { login, logout } = useContext(AuthContext);
+    const { load, stopLoading } = useContext(FormContext);
+
+    const register = async (user) => {
+        try {
+            load();
+            const response = await api.post('/auth/signup', user, {
+                withCredentials: true
+            });
+            login(response.data.user);
+            console.log({ response });
+            toast.success(response.data.message);
+            navigate('/email-verify');
+        } catch (error) {
+            console.error({ message: "Error in register", error });
+            toast.error(error.response.data.message || "Error in Signing up");
+        } finally {
+            stopLoading();
+        }
+    };
+
+    const signin = async (user) => {
+        try {
+            load();
+            const response = await api.post("/auth/login", user, {
+                withCredentials: true
+            });
+            login(response.data.user);
+            navigate('/email-verify');
+            toast.success(response.data.message);
+    
+        } catch (error) {
+            console.error({ message: "Error in signin", error });
+            toast.error(error.response.data.message || "Error in logging in");
+        } finally {
+            stopLoading();
+        }
+    }
+
+    const verify = async (code) => {
+        try {
+            load();
+            const response = await api.post("/auth/verify", { code }, {
+                withCredentials: true
+            });
+            toast.success(response.data.message);
+            navigate('/');
+        } catch (error) {
+            console.error({ message: "HERE Error in verify", error });
+            toast.error(error.response.data.message || "Error in Verifying The Account");
+        } finally {
+            stopLoading();
+        }
+    }
+
+    const signout = async () => {
+        try {
+            load();
+            const response = await api.post("/auth/logout",{
+
+            }, {
+                withCredentials: true
+            });
+            logout();
+            toast.success(response.data.message);
+    
+        } catch (error) {
+            console.error({ message: "Error in signout Hook", error });
+            toast.error(error.response.data.message || "Error in logging out");
+        } finally {
+            stopLoading();
+        }
+    }
+
+    const deleteAccount = async () => {
+        try {
+            load();
+            const response = await api.delete("/auth/account-deletion", {
+                withCredentials: true
+            });
+            logout();
+            toast.success(response.data.message);
+    
+        } catch (error) {
+            console.error({ message: "Error in deleteAccount", error });
+            toast.error(error.response.data.message || "Error in Deleting The Account");
+        } finally {
+            stopLoading();
+        }
+    }
+
+    const forgotPassword = async (email) => {
+        try {
+            load();
+            const response = await api.post("/auth/forgot-password", { email });
+            toast.success(response.data.message);
+            return true;
+        } catch (error) {
+            console.error({ message: "Error in forgotPassword", error });
+            toast.error(error.response.data.message || "Error in sending forgot password request");
+            return false;
+        } finally {
+            stopLoading();
+        }
+    }
+
+    const resetPassword = async ({ password }) => {
+        try {
+            // const { token } = useParams();
+            const token = location.pathname.split("/").slice(-1).join('');
+            // const token = location.pathname.lastIndexOf("/");
+            load();
+            const response = await api.post("/auth/reset-password", { password, token }, {
+                withCredentials: true
+            });
+            toast.success(response.data.message);
+    
+        } catch (error) {
+            console.error({ message: "Error in resetPassword Hook", error });
+            toast.error(error.response.data.message || "Error in reseting password of The Account");
+        } finally {
+            stopLoading();
+        }
+    }
+
+    const checkAuth = async () => {
+        try {
+            // await new Promise((resolve) => setTimeout(resolve, 1000));
+            const response = await api.get("/auth/check-auth", {}, {
+                withCredentials: true
+            });
+            toast.success(response.data.message); // for debugging only
+            login(response.data.user);
+    
+        } catch (error) {
+            logout();
+            console.error({ error });
+            toast.error(error?.response?.data?.message || "Error in checking authentication of The Account");
+        }
+    }
+
+    const resendOTP = async () => {
+        try {
+            load();
+            const response = await api.post("/auth/generate-otp", {}, {
+                withCredentials: true
+            });
+            toast.success(response.data.message);
+        } catch (error) {
+            logout();
+            console.error({ error });
+            toast.error(error.response.data.message || "Error in generating OTP of The Account");
+        } finally {
+            stopLoading();
+        }
+    }
+
+    return { register, signin, verify, signout, deleteAccount, forgotPassword, resetPassword, checkAuth, resendOTP };
+}
+/* 
+    Tested Utilities
+        1. Register
+        2. Signin
+        3. Signout
+        4. Verify
+        5. forgot password
+        6. reset password
+        7. Account Deletion
+    Test
+        1. check auth
+*/
+
+
+export default useAuth;

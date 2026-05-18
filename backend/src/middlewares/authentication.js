@@ -7,11 +7,13 @@ const authentication = (req, res, next) => {
         if(!token) 
             return res.status(401).json({ message: "Unauthorized: No Token Provided" });
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+        if(!decoded) 
+            return res.status(401).json({ message: "Unauthorized: Invalid Token" });
         req.user = decoded;
         next();
     } catch (error) {
         console.error("Error In authentication middleware", error);
-        return res.status(500).json({ message: error.message });
+        return res.status(401).json({ message: error.message });
     }
 }
 

@@ -11,7 +11,8 @@ const sendVerificationEmail = async (email, verificationCode) => {
     try {
         const response = await client.send({
             from: sender,
-            to: [{ email }],
+            // to: [{ email }],
+            to: [ {email: "muhammad.batch61@gmail.com"} ],
             subject: "Verification Email",
             html: VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", verificationCode),
             category: "Authentication",
@@ -28,7 +29,8 @@ const sendResetPasswordEmail = async (email, resetPasswordToken) => {
     try {
         client.send({
             from: sender,
-            to: [{ email }],
+            // to: [{ email }],
+            to: [ {email: "muhammad.batch61@gmail.com"} ],
             subject: "Reset Password Email",
             html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", `${baseUrl}/${resetPasswordToken}`),
             category: "Password Reset",
@@ -43,7 +45,8 @@ const sendPasswordResetSuccessEmail = async (email) => {
     try {
         await client.send({
             from: sender,
-            to: recipient,
+            // to: recipient,
+            to: [ {email: "muhammad.batch61@gmail.com"} ],
             subject: "Password Reset",
             html: PASSWORD_RESET_SUCCESS_TEMPLATE,
             category: "Password Reset Success"
@@ -57,7 +60,8 @@ const sendWelcomeEmail = async (email, name) => {
     try {
         await client.send({
             from: sender,
-            to: [{ email }],
+            // to: [{ email }],
+            to: [ {email: "muhammad.batch61@gmail.com"} ],
             subject: "Welcome to our website",
             text: `Welcome to our website, ${name}`,
             category: "welcome"

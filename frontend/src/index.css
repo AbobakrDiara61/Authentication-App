@@ -1,0 +1,58 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-roboto: "Roboto", sans-serif;
+
+  --animate-moving: moving 10s ease-in-out infinite alternate;
+  --animate-fade-in: fade-in 0.5s ease-in-out;
+  
+  @keyframes moving {
+    to {
+      transform: translate(100%, 100%);
+      rotate: 360deg;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer components {
+  input {
+    @apply outline-none
+  }
+
+  .main-bg {
+    @apply bg-linear-to-br from-gray-900 via-green-900 to-emerald-900;
+  }
+
+  .text-gradient {
+    @apply bg-linear-to-r text-transparent bg-clip-text from-emerald-500 to-emerald-800;
+  }
+
+  .input-wrapper {
+    @apply relative bg-slate-900/60 text-white *:first:text-emerald-500 *:last:placeholder-gray-400 text-sm flex items-center justify-start gap-2 rounded-sm mb-4 px-3 *:last:w-full hover:ring-green-500 ring-1 ring-transparent transition-all;
+  }
+
+  .input-wrapper input {
+    @apply py-2.5;
+  }
+
+  .main-btn {
+    @apply bg-linear-to-r from-emerald-500 to-emerald-800 text-white font-bold py-3 px-4 rounded-sm my-4 cursor-pointer hover:opacity-90 shadow-lg ring-green-500 focus:ring-2 transition-all duration-300
+  }
+
+  .otp-container>input {
+    @apply size-12 bg-slate-800/60 hover:bg-slate-700/40 focus:bg-slate-600/40 border border-slate-400/60 hover:border-emerald-500/50 focus:border-emerald-500 text-2xl text-white font-bold rounded-lg text-center transition-all duration-300
+  }
+
+}
