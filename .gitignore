@@ -24,5 +24,3 @@ dist-ssr
 *.sw?
 
 *.env
-/backend/src/config/nodemailer.js
-/backend/src/utils/sendEmail.js

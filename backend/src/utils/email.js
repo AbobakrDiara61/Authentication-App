@@ -1,83 +1,107 @@
 import dotenv from 'dotenv';
-import { client, sender } from "../config/mailtrap.js";
+import transporter from '../config/nodemailer.js';
 import { 
     VERIFICATION_EMAIL_TEMPLATE, 
     PASSWORD_RESET_SUCCESS_TEMPLATE,
-    PASSWORD_RESET_REQUEST_TEMPLATE
+    PASSWORD_RESET_REQUEST_TEMPLATE,
+    WELCOME_EMAIL_TEMPLATE,
+    EMAIL_VERIFIED_TEMPLATE
 } from "./emailTemplates.js";
 dotenv.config({ quiet: true });
 
-const sendVerificationEmail = async (email, verificationCode) => {
+const sendVerificationEmail = async (email, verificationCode, expiresIn = 1) => {
     try {
-        const response = await client.send({
-            from: sender,
-            // to: [{ email }],
-            to: [ {email: "muhammad.batch61@gmail.com"} ],
+        const info = await transporter.sendMail({
+            from: process.env.SENDER_EMAIL,
+            to: email,
             subject: "Verification Email",
-            html: VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", verificationCode),
+            html: VERIFICATION_EMAIL_TEMPLATE.replace("{verificationCode}", verificationCode).replace("{expiresIn}", expiresIn),
             category: "Authentication",
         });
-        console.log("Verification Email Sent", response);
+        console.log("Verification Email Sent", info.messageId);
     } catch (error) {
         console.error("Error In Sending Verification Email", error);
         throw new Error("Failed to send verification email");
     }
 }
 
+const sendSuccessfullyVerifiedEmail = async (email) => {
+    try {
+        const info = await transporter.sendMail({
+            from: process.env.SENDER_EMAIL,
+            to: email,
+            subject: "Verification Email",
+            html: EMAIL_VERIFIED_TEMPLATE,
+            category: "Authentication"
+        });
+        console.log("Verified Email Sent successfully", info.messageId);
+    } catch (error) {
+        console.error("Error In sendSuccessfullyVerifiedEmail", error);
+        throw new Error("Failed to send successfully verified email");
+    }
+}
+
 const sendResetPasswordEmail = async (email, resetPasswordToken) => {
     const baseUrl = `${process.env.CLIENT_URL}/reset-password`
     try {
-        client.send({
-            from: sender,
-            // to: [{ email }],
-            to: [ {email: "muhammad.batch61@gmail.com"} ],
+        const info = await transporter.sendMail({
+            from: process.env.SENDER_EMAIL,
+            to: email,
             subject: "Reset Password Email",
             html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetURL}", `${baseUrl}/${resetPasswordToken}`),
             category: "Password Reset",
-        }).then(console.log);
+        });
+        console.log("Reset Password Email Sent", info.messageId);
     } catch (error) {
         console.error("Error In Sending Reset Password Email", error);
     }
 }
 
 const sendPasswordResetSuccessEmail = async (email) => {
-    const recipient = [{ email }];
     try {
-        await client.send({
-            from: sender,
-            // to: recipient,
-            to: [ {email: "muhammad.batch61@gmail.com"} ],
+        const info = await transporter.sendMail({
+            from: process.env.SENDER_EMAIL,
+            to: email,
             subject: "Password Reset",
             html: PASSWORD_RESET_SUCCESS_TEMPLATE,
             category: "Password Reset Success"
         })
+        console.log("Password Reset Success Email Sent", info.messageId);
     } catch (error) {
         console.error("Error In Sending Password Reset Success Email", error);
         throw new Error("Failed to send password reset success email");
     }
 }
+
 const sendWelcomeEmail = async (email, name) => {
     try {
-        await client.send({
-            from: sender,
-            // to: [{ email }],
-            to: [ {email: "muhammad.batch61@gmail.com"} ],
+        const info = await transporter.sendMail({
+            from: process.env.SENDER_EMAIL,
+            to: email,
             subject: "Welcome to our website",
-            text: `Welcome to our website, ${name}`,
+            html: WELCOME_EMAIL_TEMPLATE.replace("{name}", name),
             category: "welcome"
         });
-        console.log("Welcome Email Sent successfully");
+        console.log("Welcome Email Sent successfully", info.messageId);
     } catch (error) {
         console.error("Error In Sending Welcome Email", error);
         throw new Error("Failed to send welcome email");
     }
 }
-// console.log(process.env.MAILTRAP_TOKEN)
-// sendVerificationEmail('muhammad.batch61@gmail.com', 125869)
+
+(async () => {
+    // await sendWelcomeEmail('muhammad.batch61@gmail.com', 'Muhammad Bakr');
+    // await sendResetPasswordEmail('muhammad.batch61@gmail.com', 'Token');
+    await sendPasswordResetSuccessEmail('muhammad.batch61@gmail.com');
+    // await sendVerificationEmail('muhammad.batch61@gmail.com', '123456');
+    await sendSuccessfullyVerifiedEmail('muhammad.batch61@gmail.com');
+})();
+
 export {
     sendVerificationEmail,
     sendWelcomeEmail,
     sendResetPasswordEmail,
-    sendPasswordResetSuccessEmail
+    sendPasswordResetSuccessEmail,
+    sendSuccessfullyVerifiedEmail,
 }
 
