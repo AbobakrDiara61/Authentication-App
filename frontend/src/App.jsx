@@ -21,6 +21,7 @@ import PrivateRoutes from './utils/PrivateRoutes';
 
 import AuthContext from './context/AuthContext';
 import useAuth from './hooks/useAuth';
+import About from './pages/About';
 
 function App() {
   const { checkAuth } = useAuth();
@@ -41,6 +42,7 @@ function App() {
       <Toaster />
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/about' element={<About />} />
         <Route element={<PrivateRoutes />}>
           <Route path='/dashboard' element={<DashBoard />} />
         </Route> 
@@ -53,9 +55,9 @@ function App() {
         </Route>
         <Route path='*' element={<PageNotFound />} />
       </Routes>
-      <Ball dynamicStyles='bg-green-500 size-64 -top-1/20 left-1/10 shadow-green-500/40'/>
-      <Ball dynamicStyles='bg-emerald-500 size-48 top-7/10 left-4/5 shadow-emerald-500/40 delay-500'/>
-      <Ball dynamicStyles='bg-lime-500 size-32 top-2/5 -left-1/10 shadow-lime-500/40 delay-800'/>
+      <Ball dynamicStyles='bg-green-500 size-64 -top-1/20 left-1/10 shadow-green-500/40 animate-moving'/>
+      <Ball dynamicStyles='bg-emerald-500 size-48 top-7/10 left-4/5 shadow-emerald-500/40 delay-500 animate-moving'/>
+      <Ball dynamicStyles='bg-lime-500 size-32 top-2/5 -left-1/10 shadow-lime-500/40 delay-800 animate-moving'/>
     </main>
   )
 }
