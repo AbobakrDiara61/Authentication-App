@@ -26,6 +26,12 @@
   }
 }
 
+@layer base {
+  button {
+    @apply cursor-pointer
+  }
+}
+
 @layer components {
   input {
     @apply outline-none
@@ -36,7 +42,7 @@
   }
 
   .text-gradient {
-    @apply bg-linear-to-r text-transparent bg-clip-text from-emerald-500 to-emerald-800;
+    @apply bg-linear-to-r text-transparent bg-clip-text from-emerald-400 to-emerald-600;
   }
 
   .input-wrapper {
@@ -48,11 +54,19 @@
   }
 
   .main-btn {
-    @apply bg-linear-to-r from-emerald-500 to-emerald-800 text-white font-bold py-3 px-4 rounded-sm my-4 cursor-pointer hover:opacity-90 shadow-lg ring-green-500 focus:ring-2 transition-all duration-300
+    @apply bg-linear-to-r from-emerald-500 to-emerald-800 text-white font-bold py-3 px-4 rounded-sm my-4 hover:opacity-90 shadow-lg ring-green-500 focus:ring-2 transition-all duration-300
   }
 
-  .otp-container>input {
-    @apply size-12 bg-slate-800/60 hover:bg-slate-700/40 focus:bg-slate-600/40 border border-slate-400/60 hover:border-emerald-500/50 focus:border-emerald-500 text-2xl text-white font-bold rounded-lg text-center transition-all duration-300
+  .ghost-btn {
+    @apply flex justify-center items-center gap-2 py-2 px-4 font-medium rounded-md transition-all bg-emerald-500/10 hover:bg-emerald-500/15 text-emerald-500;
+  }
+
+  .main-link {
+    @apply bg-linear-to-r text-transparent bg-clip-text from-emerald-400 to-emerald-500 hover:underline;
+  }
+
+  .icon-btn {
+    @apply flex justify-center items-center bg-emerald-500/10 hover:bg-emerald-500/15 p-4 rounded-full hover:scale-110 transition-all duration-300;
   }
 
 }
