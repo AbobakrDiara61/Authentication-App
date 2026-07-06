@@ -89,14 +89,6 @@ const sendWelcomeEmail = async (email, name) => {
     }
 }
 
-(async () => {
-    // await sendWelcomeEmail('muhammad.batch61@gmail.com', 'Muhammad Bakr');
-    // await sendResetPasswordEmail('muhammad.batch61@gmail.com', 'Token');
-    await sendPasswordResetSuccessEmail('muhammad.batch61@gmail.com');
-    // await sendVerificationEmail('muhammad.batch61@gmail.com', '123456');
-    await sendSuccessfullyVerifiedEmail('muhammad.batch61@gmail.com');
-})();
-
 export {
     sendVerificationEmail,
     sendWelcomeEmail,

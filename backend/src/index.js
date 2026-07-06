@@ -10,12 +10,10 @@ dotenv.config({ quiet: true });
 const app = express();
 app.use(express.json());
 app.use(cookieParser()); // parse incoming cookies
-if(process.env.NODE_ENV === 'development'){
-    app.use(cors({
-        origin: 'http://localhost:5173',
-        credentials: true
-    }));
-}
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true
+}));
 
 app.use('/api/auth', authRouter);
 
