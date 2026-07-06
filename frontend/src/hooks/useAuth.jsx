@@ -5,13 +5,11 @@ import AuthContext from '../context/AuthContext';
 import FormContext from '../context/FormContext';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-// We can make it for all requests
-// axios.defaults.withCredentials = true; 
 
 const useAuth = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { login, logout } = useContext(AuthContext);
+    const { user, login, logout } = useContext(AuthContext);
     const { load, stopLoading } = useContext(FormContext);
 
     const register = async (user) => {
@@ -35,13 +33,11 @@ const useAuth = () => {
     const signin = async (user) => {
         try {
             load();
-            const response = await api.post("/auth/login", user, {
-                withCredentials: true
-            });
+            const response = await api.post("/auth/login", user);
             login(response.data.user);
-            navigate('/email-verify');
             toast.success(response.data.message);
-    
+            navigate('/email-verify');
+
         } catch (error) {
             console.error({ message: "Error in signin", error });
             toast.error(error.response.data.message || "Error in logging in");
@@ -53,9 +49,8 @@ const useAuth = () => {
     const verify = async (code) => {
         try {
             load();
-            const response = await api.post("/auth/verify", { code }, {
-                withCredentials: true
-            });
+            const response = await api.post("/auth/verify", { code });
+            login({ ...user, isVerified: true })
             toast.success(response.data.message);
             navigate('/');
         } catch (error) {
@@ -69,14 +64,10 @@ const useAuth = () => {
     const signout = async () => {
         try {
             load();
-            const response = await api.post("/auth/logout",{
-
-            }, {
-                withCredentials: true
-            });
+            const response = await api.post("/auth/logout");
             logout();
             toast.success(response.data.message);
-    
+            navigate('/login');
         } catch (error) {
             console.error({ message: "Error in signout Hook", error });
             toast.error(error.response.data.message || "Error in logging out");
@@ -88,12 +79,10 @@ const useAuth = () => {
     const deleteAccount = async () => {
         try {
             load();
-            const response = await api.delete("/auth/account-deletion", {
-                withCredentials: true
-            });
+            const response = await api.delete("/auth/account-deletion");
             logout();
             toast.success(response.data.message);
-    
+            navigate('/register');
         } catch (error) {
             console.error({ message: "Error in deleteAccount", error });
             toast.error(error.response.data.message || "Error in Deleting The Account");
@@ -127,7 +116,7 @@ const useAuth = () => {
                 withCredentials: true
             });
             toast.success(response.data.message);
-    
+            navigate('/login');
         } catch (error) {
             console.error({ message: "Error in resetPassword Hook", error });
             toast.error(error.response.data.message || "Error in reseting password of The Account");
@@ -144,7 +133,7 @@ const useAuth = () => {
             });
             toast.success(response.data.message); // for debugging only
             login(response.data.user);
-    
+
         } catch (error) {
             logout();
             console.error({ error });
@@ -170,18 +159,5 @@ const useAuth = () => {
 
     return { register, signin, verify, signout, deleteAccount, forgotPassword, resetPassword, checkAuth, resendOTP };
 }
-/* 
-    Tested Utilities
-        1. Register
-        2. Signin
-        3. Signout
-        4. Verify
-        5. forgot password
-        6. reset password
-        7. Account Deletion
-    Test
-        1. check auth
-*/
-
 
 export default useAuth;

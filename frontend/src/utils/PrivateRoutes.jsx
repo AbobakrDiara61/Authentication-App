@@ -9,11 +9,11 @@ const PrivateRoutes = () => {
         cond: user?.isVerified === false,
         isAuthenticated
     })
-/*     if(!isAuthenticated)
+    if(!isAuthenticated)
         return <Navigate to="/login" />;
     
     if(user.isVerified === false)
-        return <Navigate to="/email-verify" />; */
+        return <Navigate to="/email-verify" />;
     
     return <Outlet />
 }
