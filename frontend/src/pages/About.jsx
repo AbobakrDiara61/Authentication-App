@@ -3,13 +3,23 @@ import { Route, ArrowRight } from 'lucide-react'
 import MainLayout from '../components/MainLayout'
 import { techStack, features, steps } from '../constants/index'
 import Card from '../components/Card'
+import { useContext } from 'react'
+import AuthContext from '../context/AuthContext'
 
 const About = () => {
+  const { user } = useContext(AuthContext);
+
   return (
     <MainLayout
       title="About This Project"
       footer={
+        user ?
         <>
+          Start exploring your workspace.
+          <Link to="/dashboard" className="main-link ml-2">
+            Go to Dashboard
+          </Link>
+        </> : <>
           Want to try it?
           <Link to="/register" className="main-link ml-2">
             Create an account

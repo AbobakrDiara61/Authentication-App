@@ -3,7 +3,7 @@ import api from '../utils/api'
 import { toast } from 'react-hot-toast'
 import AuthContext from '../context/AuthContext';
 import FormContext from '../context/FormContext';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate/* , useParams */ } from 'react-router-dom';
 
 
 const useAuth = () => {

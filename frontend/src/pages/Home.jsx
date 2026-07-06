@@ -23,7 +23,7 @@ const Home = () => {
           />
         </div>
         
-        <div className="flex justify-center space-x-5 mb-6">
+        <div className="flex justify-center space-x-5 mb-4">
           <a 
             href="https://github.com/AbobakrDiara61" 
             target="_blank" 

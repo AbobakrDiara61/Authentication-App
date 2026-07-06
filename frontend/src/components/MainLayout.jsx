@@ -3,7 +3,7 @@ import Ball from './Ball'
 const MainLayout = ({ children, title, footer, className, wide = false }) => {
 
   return (
-    <section className="w-full min-h-screen flex items-center justify-center px-2 py-6 relative overflow-hidden bg-linear-to-br from-black/80 via-slate-900/35 to-black/80">
+    <section className="w-full min-h-screen flex items-center justify-center px-2 py-6 md:py-2 relative overflow-hidden bg-linear-to-br from-black/80 via-slate-900/35 to-black/80">
 
       <div
         className={`
