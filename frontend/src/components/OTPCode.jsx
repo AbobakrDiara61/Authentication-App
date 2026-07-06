@@ -50,7 +50,7 @@ const OTPCode = ({ otp, setOtp }) => {
   }
   
   return (
-    <div className='otp-container flex justify-center items-center gap-2'>
+    <div className='flex justify-center items-center gap-2'>
         {otp.map((_, index) => 
           <input 
             type='text' 
@@ -59,6 +59,7 @@ const OTPCode = ({ otp, setOtp }) => {
             onChange={(e) => handleChange(e, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
             ref={(el) => otpRefs.current[index] = el}
+            className='size-12 bg-slate-800/60 hover:bg-slate-700/40 focus:bg-slate-600/40 border border-slate-400/60 hover:border-emerald-500/50 focus:border-emerald-500 text-2xl text-white font-bold rounded-lg text-center transition-all duration-300'
           />
         )}
     </div>

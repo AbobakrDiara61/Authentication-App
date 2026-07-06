@@ -1,6 +1,6 @@
-const Ball = ({ dynamicStyles }) => {
+const Ball = ({ dynamicStyles, opacity = 'opacity-20' }) => {
   return (
-    <div className={`${dynamicStyles} absolute opacity-20 rounded-full blur-xl shadow-lg animate-moving z-0`}
+    <div className={`${dynamicStyles} absolute ${opacity} rounded-full blur-xl shadow-lg z-0`}
       aria-hidden='true'
     ></div>
   )
