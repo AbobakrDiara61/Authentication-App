@@ -268,7 +268,7 @@ const refresh = async (req, res) => {
 
         // React strict mode causes this error (in dev mode)
         const isTokenMatched = await bcryptjs.compare(refreshToken, user.refreshToken);
-        if(!user.refreshToken || isTokenMatched) 
+        if(!user.refreshToken || !isTokenMatched) 
             return res.status(403).json({ message: "Problem with refreshToken" });            
         
         const newRefreshToken = createRefreshToken({ _id: user._id });
