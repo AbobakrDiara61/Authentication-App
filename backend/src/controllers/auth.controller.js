@@ -39,7 +39,9 @@ const signup = async (req, res) => {
         setCookie(res, token, 'token');
         const refreshToken = createRefreshToken({ _id: user._id });
         setCookie(res, refreshToken, 'refreshToken');
-        await sendVerificationEmail(email, verficationCode);
+        user.refreshToken = await bcryptjs.hash(refreshToken, 10);
+        await user.save();
+        await sendVerificationEmail(email, verficationCode, 3);
         return res.status(201).json({
             message: "User created successfully", 
             user: {
@@ -80,7 +82,7 @@ const login = async (req, res) => {
             const verificationCodeExpiresAt = Date.now() + 3 * 60 * 1000; // 3 minutes
             user.verificationCode = verficationCode;
             user.verificationCodeExpiresAt = verificationCodeExpiresAt;
-            await sendVerificationEmail(user.email, verficationCode);
+            await sendVerificationEmail(user.email, verficationCode, 3);
 
             user.lastLoginAt = Date.now();
             await user.save();
@@ -89,6 +91,9 @@ const login = async (req, res) => {
             setCookie(res, token, 'token');
             const refreshToken = createRefreshToken({ _id: user._id });
             setCookie(res, refreshToken, 'refreshToken');
+
+            user.refreshToken = await bcryptjs.hash(refreshToken, 10);
+            await user.save();
             return res.status(200).json({
                 message: "Login successful", 
                 user: {
@@ -261,20 +266,16 @@ const refresh = async (req, res) => {
         if(!user)
             return res.status(403).json({ message: "Unauthorized" });
 
-        console.log({
-            user: user.refreshToken,
-            refreshToken,
-            // newRefreshToken
-        })
         // React strict mode causes this error (in dev mode)
-        // if(!user.refreshToken || user.refreshToken !== refreshToken)
-            // return res.status(403).json({ message: "Problem with refreshToken" });
+        const isTokenMatched = await bcryptjs.compare(refreshToken, user.refreshToken);
+        if(!user.refreshToken || isTokenMatched) 
+            return res.status(403).json({ message: "Problem with refreshToken" });            
         
         const newRefreshToken = createRefreshToken({ _id: user._id });
         const token = createToken({ name: user.name, email: user.email, _id: user._id });
         setCookie(res, token, 'token');
         setCookie(res, newRefreshToken, 'refreshToken');
-        user.refreshToken = newRefreshToken;
+        user.refreshToken = await bcryptjs.hash(newRefreshToken, 10);
         await user.save();
 
         return res.status(200).json({ message: "Token refreshed successfuly" });
@@ -297,7 +298,7 @@ const resendOTP = async (req, res) => {
         user.verificationCode = OTP;
         user.verificationCodeExpiresAt = Date.now() + 60 * 1000;
         await user.save();
-        await sendVerificationEmail(user.email, OTP);
+        await sendVerificationEmail(user.email, OTP, 3);
         
         return res.status(200).json({ message: "OTP sent successfully" });
 
