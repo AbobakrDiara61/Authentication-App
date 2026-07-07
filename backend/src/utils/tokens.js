@@ -12,7 +12,7 @@ const setCookie = (res, cookieValue, fieldName, maxAge = 3 * 24 * 60 * 60 * 1000
     res.cookie(fieldName, cookieValue, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge
     })
 }
