@@ -53,9 +53,11 @@ const useAuth = () => {
             login({ ...user, isVerified: true })
             toast.success(response.data.message);
             navigate('/');
+            return true;
         } catch (error) {
             console.error({ message: "HERE Error in verify", error });
             toast.error(error.response.data.message || "Error in Verifying The Account");
+            return false;
         } finally {
             stopLoading();
         }

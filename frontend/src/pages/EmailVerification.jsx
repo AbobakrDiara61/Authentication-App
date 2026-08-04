@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useRef, useState } from 'react'
 import OTPCode from '../components/OTPCode'
 import FormContext from '../context/FormContext'
 import useAuth from '../hooks/useAuth';
@@ -9,19 +9,27 @@ const EmailVerification = () => {
   const [otp, setOtp] = useState(Array(6).fill(''));
   const { state } = useContext(FormContext);
   const { isLoading } = state;
+  const verifying = useRef(false);
   const { verify, resendOTP } = useAuth();
 
   const handleVerifying = async (e) => {
     e.preventDefault();
-    await verify(otp.join(''));
+    const success = await verify(otp.join(''));
+    if(!success) setOtp(Array(6).fill(''));
   }
 
   useEffect(() => {
+    const verifyOTP = async () => {
+      if (otp.every(digit => digit !== '') && !verifying.current) {
+        verifying.current = true;
+        const success = await verify(otp.join(''));
+        verifying.current = false;
+        if(!success) setOtp(Array(6).fill(''));
+      }
+    };
 
-    if(otp.filter(digit => digit !== '').length === otp.length) 
-      handleVerifying(new Event('submit'));
-    
-  }, [ otp ]);
+    verifyOTP();
+  }, [otp, verify]);
   return (
     <AuthLayout
       title='Verify Your Email'
