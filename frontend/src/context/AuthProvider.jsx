@@ -3,6 +3,7 @@ import AuthContext from './AuthContext'
 const ACTIONS = {
     LOGIN: "LOGIN",
     LOGOUT: "LOGOUT",
+    UPDATE_USER: "UPDATE_USER",
     START_LOADING: "START_LOADING",
     STOP_LOADING: "STOP_LOADING"
 }
@@ -20,6 +21,14 @@ const AuthProvider = ({ children }) => {
                     ...state,
                     user: null,
                     isAuthenticated: false
+                };
+            case ACTIONS.UPDATE_USER: 
+                return { 
+                    ...state, 
+                    user: { 
+                        ...state.user, 
+                        ...action.payload 
+                    } 
                 };
             case ACTIONS.START_LOADING:
                 return {
@@ -50,6 +59,12 @@ const AuthProvider = ({ children }) => {
         });
     }
     
+    const updateUser = (updates) => { 
+        dispatch({ 
+            type: ACTIONS.UPDATE_USER, payload: updates 
+        }); 
+    };
+    
     const startLoading = () => dispatch({ type: ACTIONS.START_LOADING });
     const stopLoading = () => dispatch({ type: ACTIONS.STOP_LOADING });
     
@@ -58,6 +73,7 @@ const AuthProvider = ({ children }) => {
             ...state,
             login,
             logout,
+            updateUser,
             startLoading,
             stopLoading,
         }}>

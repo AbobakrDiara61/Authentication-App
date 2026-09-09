@@ -9,8 +9,8 @@ import { useLocation, useNavigate/* , useParams */ } from 'react-router-dom';
 const useAuth = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { user, login, logout } = useContext(AuthContext);
-    const { load, stopLoading } = useContext(FormContext);
+    const { user, login, logout, updateUser } = useContext(AuthContext);
+    const { load, stopLoading, reset } = useContext(FormContext);
 
     const register = async (user) => {
         try {
@@ -139,7 +139,7 @@ const useAuth = () => {
         } catch (error) {
             logout();
             console.error({ error });
-            toast.error(error?.response?.data?.message || "Error in checking authentication of The Account");
+            toast.error("User is not authenticated");
         }
     }
 
@@ -159,7 +159,25 @@ const useAuth = () => {
         }
     }
 
-    return { register, signin, verify, signout, deleteAccount, forgotPassword, resetPassword, checkAuth, resendOTP };
+    const changeEmail = async (email) => {
+        try {
+            load();
+            const response = await api.post("/auth/change-email", { email }, {
+                withCredentials: true
+            });
+            toast.success(response.data.message);
+            updateUser({ email });
+            navigate('/dashboard');
+            reset();
+        } catch (error) {
+            console.error({ error });
+            toast.error(error.response.data.message || "Failed to change the email.");
+        } finally {
+            stopLoading();
+        }
+    }
+
+    return { register, signin, verify, signout, deleteAccount, forgotPassword, resetPassword, checkAuth, resendOTP, changeEmail };
 }
 
 export default useAuth;

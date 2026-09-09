@@ -8,7 +8,7 @@ import { LogOut, Trash2, User, Mail, Clock, CalendarDays, ShieldAlert } from 'lu
 const DataBlock = ({ icon: Icon, label, value }) => {
   return (
     <div className='flex items-center gap-2 mb-2 text-sm'>
-        <Icon className="size-5 text-emerald-500" />
+        {Icon && <Icon className="size-5 text-emerald-500" />}
         <div>
           <p className='text-white/60 font-bold text-xs'>{label}</p>
           <p className='text-white font-medium'>{value}</p>
@@ -60,7 +60,11 @@ const DashBoard = () => {
             Delete Account
           </button>
       </div>
-      <Link to='/' className={`${actionButtonStyle} mt-5 py-4`}>
+      <Link to='/change-email' className={`${actionButtonStyle} my-4 py-2`}>
+        <Mail className="size-4" />
+        Change Email
+      </Link>
+      <Link to='/' className={`${actionButtonStyle} py-2`}>
         Return Home
       </Link>
     </MainLayout>

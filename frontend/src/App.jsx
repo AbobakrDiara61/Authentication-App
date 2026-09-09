@@ -11,6 +11,7 @@ import RegisterPage from './pages/RegisterPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import EmailVerification from './pages/EmailVerification'
+import ChangeEmail from './pages/ChangeEmail'
 // Common Components & Pages
 import PageNotFound from './pages/PageNotFound'
 import Ball from './components/Ball'
@@ -45,6 +46,7 @@ function App() {
         <Route path='/about' element={<About />} />
         <Route element={<PrivateRoutes />}>
           <Route path='/dashboard' element={<DashBoard />} />
+          <Route path='/change-email' element={<ChangeEmail />} />
         </Route> 
         <Route element={<RedirectHome />}>
           <Route path='/register' element={<RegisterPage />} />
