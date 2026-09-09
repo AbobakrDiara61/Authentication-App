@@ -70,13 +70,13 @@ const login = async (req, res) => {
             if(!password) 
                 return res.status(400).json({ message: "Password is required" });
             
-            const user= await User.findOne({ email });
+            const user = await User.findOne({ email });
             if(!user)
-                return res.status(404).json({ message: "User not found" });
+                return res.status(400).json({ message: "Invalid Email or Password." });
             
             const isPasswordValid = await bcryptjs.compare(password, user.password);
             if(!isPasswordValid)
-                return res.status(401).json({ message: "Invalid Password" });
+                return res.status(400).json({ message: "Invalid Email or Password." });
 
             const verficationCode = Math.floor(100000 + 900000 * Math.random());
             const verificationCodeExpiresAt = Date.now() + 3 * 60 * 1000; // 3 minutes
@@ -92,7 +92,7 @@ const login = async (req, res) => {
             const refreshToken = createRefreshToken({ _id: user._id });
             setCookie(res, refreshToken, 'refreshToken');
 
-            user.refreshToken = await bcryptjs.hash(refreshToken, 10);
+            user.refreshToken = await bcryptjs.hash(refreshToken, 4);
             await user.save();
             return res.status(200).json({
                 message: "Login successful", 
@@ -308,6 +308,23 @@ const resendOTP = async (req, res) => {
     }
 }
 
+const changeEmail = async (req, res) => {
+    try {
+        const { _id } = req.user;
+        const { email } = req.body;
+        const isEmailExists = await User.findOne({ email });
+        if(isEmailExists)
+            return res.status(400).json({ message: "This email currently in use" });
+
+        await User.findByIdAndUpdate(_id, { email });
+
+        return res.status(200).json({ message: "Email updated successfuly" }); 
+    } catch (error) {
+        console.error("Error in changeEmail controller", error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
 const authControllers = {
     signup,
     login,
@@ -319,6 +336,7 @@ const authControllers = {
     checkAuthentication,
     refresh,
     resendOTP,
+    changeEmail
 };
 
 export default authControllers;

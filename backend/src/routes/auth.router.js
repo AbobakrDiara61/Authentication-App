@@ -1,7 +1,7 @@
 import express from "express";
 import authControllers from "../controllers/auth.controller.js";
 import authentication from "../middlewares/authentication.js";
-const { signup, login, logout, verifyOTP, deleteAccount, forgotPassword, resetPassword, checkAuthentication, refresh, resendOTP } = authControllers;
+const { signup, login, logout, verifyOTP, deleteAccount, forgotPassword, resetPassword, checkAuthentication, refresh, resendOTP, changeEmail } = authControllers;
 const router = express.Router();
 
 router.post('/signup', signup);
@@ -14,5 +14,6 @@ router.post('/reset-password', resetPassword);
 router.get('/check-auth', authentication, checkAuthentication);
 router.post('/generate-otp', authentication, resendOTP);
 router.post('/refresh', refresh);
+router.post('/change-email', authentication, changeEmail);
 
 export default router
