@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import Ball from "./Ball"
 
 const AuthLayout = ({ title, subtitle, children, footer, wide = false }) => {
@@ -17,7 +18,11 @@ const AuthLayout = ({ title, subtitle, children, footer, wide = false }) => {
         opacity='opacity-5'
       />
 
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -24 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
         className={`
           relative z-10 w-full
           ${wide ? "max-w-xl" : "max-w-md"}
@@ -49,7 +54,7 @@ const AuthLayout = ({ title, subtitle, children, footer, wide = false }) => {
             {footer}
           </div>
         )}
-      </div>
+      </motion.div>
     </section>
   );
 };

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Github, Linkedin, Briefcase, LayoutDashboard } from "lucide-react";
 import MainLayout from '../components/MainLayout';
+import AppImage from '../components/AppImage';
 
 const Home = () => {
   return (
@@ -13,15 +14,17 @@ const Home = () => {
           </Link>
       </>}
     >
-      <div className="size-full group">        
-        <div className="size-64 mx-auto mt-6 mb-15 p-1 rounded-full overflow-hidden bg-gray-950 border-2 border-emerald-500/50 group-hover:border-emerald-500 shadow-xl shadow-green-400/10 group-hover:shadow-green-400/25 scale-100 group-hover:scale-110 transition-all duration-300">
-          <img 
-            src="https://res.cloudinary.com/dzmnrmrvs/image/upload/v1776685936/20250131_161116_1_vxyszm.jpg"
-            alt="Profile" 
-            className="size-full object-cover rounded-full"
-            onError={(e) => e.target.style.display = 'none'}
+      <div className="size-full group"> 
+
+        <Link 
+          to="/about" 
+          className='outline-0'
+        >
+          <AppImage 
+              src="https://res.cloudinary.com/dzmnrmrvs/image/upload/v1788953991/2151883579_wmxg3x.jpg"
+              alt="Profile"
           />
-        </div>
+        </Link>
         
         <div className="flex justify-center space-x-5 mb-4">
           <a 
@@ -33,21 +36,21 @@ const Home = () => {
             <Github className="text-slate-300 group-hover/icon:text-emerald-500 transition-colors duration-300" size={24} />
           </a>
           <a 
-            href="https://www.linkedin.com/in/muhammad-abobakr-970338343/" 
+            href="https://www.linkedin.com/in/muhammad-abobakr/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="icon-btn group/icon"
           >
             <Linkedin className="text-slate-300 group-hover/icon:text-emerald-500 transition-colors duration-300" size={24} />
           </a>
-          <a 
+{/*           <a 
             href="https://yourportfolio.com" 
             target="_blank" 
             rel="noopener noreferrer"
             className="icon-btn group/icon"
           >
             <Briefcase className="text-slate-300 group-hover/icon:text-emerald-500 transition-colors duration-300" size={24} />
-          </a>
+          </a> */}
         </div>
 
         <Link 
