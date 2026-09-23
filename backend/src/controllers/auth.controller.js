@@ -47,7 +47,6 @@ const login = async (req, res) => {
     try {
         const fields = ["email", "password"];
         const body = pick(req.body, fields);
-        console.log(body)
         ensureStrings(body, fields);
         const { user, token, refreshToken } = await authServices.login(body);
 
@@ -91,7 +90,10 @@ const logout = async (req, res) => {
 
 const verifyOTP = async (req, res) => {
     try {
-        const { code } = req.body;
+        const fields = ["code"];
+        const { code } = pick(req.body, fields);
+        ensureStrings({ code }, fields);
+
         const { _id } = req.user;
         const user = await User.findById(_id);
         if(!user)
