@@ -45,53 +45,27 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        try {
-            if(!email) 
-                return res.status(400).json({ message: "Email is required" });
-            if(!password) 
-                return res.status(400).json({ message: "Password is required" });
-            
-            const user = await User.findOne({ email });
-            if(!user)
-                return res.status(400).json({ message: "Invalid Email or Password." });
-            
-            const isPasswordValid = await bcryptjs.compare(password, user.password);
-            if(!isPasswordValid)
-                return res.status(400).json({ message: "Invalid Email or Password." });
+        const fields = ["email", "password"];
+        const body = pick(req.body, fields);
+        console.log(body)
+        ensureStrings(body, fields);
+        const { user, token, refreshToken } = await authServices.login(body);
 
-            const verficationCode = Math.floor(100000 + 900000 * Math.random());
-            const verificationCodeExpiresAt = Date.now() + 3 * 60 * 1000; // 3 minutes
-            user.verificationCode = verficationCode;
-            user.verificationCodeExpiresAt = verificationCodeExpiresAt;
-            await sendVerificationEmail(user.email, verficationCode, 3);
+        setCookie(res, token, 'token');
+        setCookie(res, refreshToken, 'refreshToken');
 
-            user.lastLoginAt = Date.now();
-            await user.save();
-
-            const token = createToken({ name: user.name, email, _id: user._id });
-            setCookie(res, token, 'token');
-            const refreshToken = createRefreshToken({ _id: user._id });
-            setCookie(res, refreshToken, 'refreshToken');
-
-            user.refreshToken = await bcryptjs.hash(refreshToken, 4);
-            await user.save();
-            return res.status(200).json({
-                message: "Login successful", 
-                user: {
-                    ...user._doc,
-                    password: undefined,
-                    verificationCode: undefined,
-                    verificationCodeExpiresAt: undefined,
-                    refreshToken: undefined,
-                }
-            });
-        } catch (error) {
-            console.error("Error In login controller", error);
-            return res.status(500).json({ message: error.message });
-        }
+        return res.status(200).json({
+            message: "Login successful",
+            user: {
+                ...user._doc,
+                password: undefined,
+                verificationCode: undefined,
+                verificationCodeExpiresAt: undefined,
+                refreshToken: undefined,
+            }
+        });
     } catch (error) {
-        console.error("Error In login controller", error);
+        console.error("Error in login controller", error);
         return res.status(500).json({ message: error.message });
     }
 };

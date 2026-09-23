@@ -41,6 +41,37 @@ const signup = async (data) => {
     }
 };
 
+const login = async (data) => {
+    const { email, password } = data;
+
+    if (!email) throw new Error("Email is required");
+    if (!password) throw new Error("Password is required");
+
+    const user = await User.findOne({ email });
+    if (!user) throw new Error("Invalid Email or Password.");
+
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) throw new Error("Invalid Email or Password.");
+
+    const verficationCode = Math.floor(100000 + 900000 * Math.random());
+    const verificationCodeExpiresAt = Date.now() + 3 * 60 * 1000; // 3 minutes
+
+    user.verificationCode = verficationCode;
+    user.verificationCodeExpiresAt = verificationCodeExpiresAt;
+    user.lastLoginAt = Date.now();
+
+    await sendVerificationEmail(user.email, verficationCode, 3);
+
+    const token = createToken({ name: user.name, email, _id: user._id });
+    const refreshToken = createRefreshToken({ _id: user._id });
+
+    user.refreshToken = await bcryptjs.hash(refreshToken, 6);
+    await user.save();
+
+    return { user, token, refreshToken };
+};
+
 export {
     signup,
+    login,
 }
