@@ -1,9 +1,13 @@
+import crypto from 'crypto'
 import bcryptjs from 'bcryptjs'
+import validator from 'validator'
 import User from "../models/user.model.js";
 import { validate } from "../utils/validate.js";
 import tokenUtils from "../utils/tokens.js";
 import { 
     sendVerificationEmail, 
+    sendResetPasswordEmail,
+    sendPasswordResetSuccessEmail,
 } from "../utils/email.js";
 
 const { createToken, createRefreshToken } = tokenUtils;
@@ -84,8 +88,54 @@ const resendOTP = async (_id) => {
     await sendVerificationEmail(user.email, OTP, 3);
 };
 
+const forgotPassword = async (email) => {
+    const user = await User.findOne({ email });
+    if (!user) throw new Error("User not Found Invalid Email Credential");
+    console.log({user})
+    const resetPasswordToken = crypto.randomBytes(32).toString("hex");
+    const resetPasswordTokenExpiresAt = Date.now() + 60 * 1000; // 1 minute
+
+    user.resetPasswordToken = resetPasswordToken;
+    user.resetPasswordTokenExpiresAt = resetPasswordTokenExpiresAt;
+    await user.save();
+
+    await sendResetPasswordEmail(email, resetPasswordToken);
+};
+
+const resetPassword = async (data) => {
+    const { token, password } = data;
+
+    if (!password) throw new Error("Password is required");
+    if (!validator.isStrongPassword(password, {
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1
+    })) {
+        throw new Error("Password is not strong");
+    }
+
+    const user = await User.findOne({
+        resetPasswordToken: token,
+        resetPasswordTokenExpiresAt: { $gt: Date.now() }
+    });
+
+    if (!user) throw new Error("Invalid Token");
+
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpiresAt = undefined;
+    await user.save();
+
+    await sendPasswordResetSuccessEmail(user.email);
+};
+
 export {
     signup,
     login,
     resendOTP,
+    forgotPassword,
+    resetPassword,
 }

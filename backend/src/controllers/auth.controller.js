@@ -1,16 +1,11 @@
 import bcryptjs from 'bcryptjs'
-import crypto from 'crypto'
-import validator from 'validator'
 import jwt from 'jsonwebtoken'
 
 import User from "../models/user.model.js";
 import * as authServices from '../services/auth.service.js'
 import tokenUtils from "../utils/tokens.js";
 import { 
-    sendVerificationEmail, 
     sendWelcomeEmail, 
-    sendResetPasswordEmail, 
-    sendPasswordResetSuccessEmail 
 } from "../utils/email.js";
 import { ensureStrings, pick } from '../utils/validate.js';
 
@@ -138,18 +133,13 @@ const deleteAccount = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
     try {
-        const { email } = req.body;
-        const user = await User.findOne({ email });
-        if(!user) 
-            return res.status(404).json({ message: "User not Found Invalid Email Credential" });
+        const fields = ["email"];
+        const { email } = pick(req.body, fields);
 
-        const resetPasswordToken = crypto.randomBytes(32).toString('hex');
-        const resetPasswordTokenExpiresAt = Date.now() + 60 * 1000;
-        user.resetPasswordToken = resetPasswordToken;
-        user.resetPasswordTokenExpiresAt = resetPasswordTokenExpiresAt;
-        await user.save();
-        
-        await sendResetPasswordEmail(email, resetPasswordToken);
+        ensureStrings({ email }, fields);
+
+        await authServices.forgotPassword(email);
+
         return res.status(200).json({ message: "Reset Password Request Sent Successfully" });
     } catch (error) {
         console.error("Error In forgotPassword Controller", error);
@@ -159,39 +149,12 @@ const forgotPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     try {
-        const { token, password } = req.body;
-        const user = await User.findOne({
-            resetPasswordToken: token,
-            resetPasswordTokenExpiresAt: { $gt: Date.now() }
-        })
-        console.log({token, password})
-        if(!user)
-            return res.status(404).json({ message: "Invalid Token" });
-        /* 
-            1. hash the new password
-            2. update the database
-                1. new password
-                2. reset password token
-                3. reset password token expires at
-            3. send email to user
-            4. send success response
-        */
-        if(!password) 
-            return res.status(400).json({ message: "Password is required" });
-        if(!validator.isStrongPassword(password, {
-            minLength: 8,
-            minLowercase: 1,
-            minUppercase: 1,
-            minNumbers: 1,
-            minSymbols: 1
-        }))
-            return res.status(400).json({ message: "Password is not strong" });
-        const hashedPassword = await bcryptjs.hash(password, 10);
-        user.password = hashedPassword;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordTokenExpiresAt = undefined;
-        await user.save();
-        await sendPasswordResetSuccessEmail(user.email);
+        const fields = ["token", "password"];
+        const body = pick(req.body, fields);
+        ensureStrings(body, fields);
+
+        await authServices.resetPassword(body);
+
         return res.status(200).json({ message: "Password reset successfully" });
     } catch (error) {
         console.error("Error In resetPassword Controller", error);
