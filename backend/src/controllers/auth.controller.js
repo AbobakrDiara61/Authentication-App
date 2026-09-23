@@ -221,7 +221,11 @@ const resendOTP = async (req, res) => {
 const changeEmail = async (req, res) => {
     try {
         const { _id } = req.user;
-        const { email } = req.body;
+
+        const fields = ["email"];
+        const { email } = pick(req.body, fields);
+        ensureStrings({ email }, fields);
+
         const isEmailExists = await User.findOne({ email });
         if(isEmailExists)
             return res.status(400).json({ message: "This email currently in use" });
