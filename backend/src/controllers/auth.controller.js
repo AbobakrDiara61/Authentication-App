@@ -4,44 +4,28 @@ import validator from 'validator'
 import jwt from 'jsonwebtoken'
 
 import User from "../models/user.model.js";
+import * as authServices from '../services/auth.service.js'
 import tokenUtils from "../utils/tokens.js";
-import validate from "../utils/validate.js";
 import { 
     sendVerificationEmail, 
     sendWelcomeEmail, 
     sendResetPasswordEmail, 
     sendPasswordResetSuccessEmail 
 } from "../utils/email.js";
+import { ensureStrings, pick } from '../utils/validate.js';
 
 const { createToken, setCookie, createRefreshToken } = tokenUtils;
 const signup = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
-        validate({ name, email, password });
+        const fields = ["name", "email", "password"];
+        const body = pick(req.body, fields);
+        ensureStrings(body, fields);
 
-        const exits = await User.findOne({ email });
-        if(exits) 
-            return res.status(400).json({ message: "User already exists"});
-        
-        const hasedPassword = await bcryptjs.hash(password, 10);
-        const verficationCode = Math.floor(100000 + 900000 * Math.random());
-        const verificationCodeExpiresAt = Date.now() + 3 * 60 * 1000; // 3 minutes
-        const user = new User({ 
-            name, 
-            email, 
-            password: hasedPassword, 
-            verificationCode: verficationCode,
-            verificationCodeExpiresAt: verificationCodeExpiresAt
-        });
+        const { user, token, refreshToken } = await authServices.signup(body);
 
-        await user.save();
-        const token = createToken({ name, email, _id: user._id });
         setCookie(res, token, 'token');
-        const refreshToken = createRefreshToken({ _id: user._id });
         setCookie(res, refreshToken, 'refreshToken');
-        user.refreshToken = await bcryptjs.hash(refreshToken, 10);
-        await user.save();
-        await sendVerificationEmail(email, verficationCode, 3);
+
         return res.status(201).json({
             message: "User created successfully", 
             user: {
@@ -54,8 +38,6 @@ const signup = async (req, res) => {
         });
         
     } catch (error) {
-        const { email } = req.body; 
-        await User.findOneAndDelete({ email });
         console.error("Error in Sign up controller", error);
         return res.status(500).json({ message: error.message });
     }
