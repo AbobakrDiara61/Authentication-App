@@ -71,7 +71,21 @@ const login = async (data) => {
     return { user, token, refreshToken };
 };
 
+const resendOTP = async (_id) => {
+    const user = await User.findById(_id);
+    if (!user) throw new Error("User Not Found");
+    if (user.isVerified) throw new Error("User is already verified");
+
+    const OTP = Math.floor(100000 + Math.random() * 900000);
+    user.verificationCode = OTP;
+    user.verificationCodeExpiresAt = Date.now() + 3 * 60 * 1000; // 3 minute
+    await user.save();
+
+    await sendVerificationEmail(user.email, OTP, 3);
+};
+
 export {
     signup,
     login,
+    resendOTP,
 }

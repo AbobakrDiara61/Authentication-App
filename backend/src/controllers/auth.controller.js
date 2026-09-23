@@ -246,18 +246,7 @@ const refresh = async (req, res) => {
 const resendOTP = async (req, res) => {
     try {
         const { _id } = req.user;
-        const user = await User.findById(_id);
-        if(!user) 
-            return res.status(404).json({ message: "User Not Found "});
-        if(user.isVerified)
-            return res.status(400).json({ message: "User is already verified" });
-        
-        const OTP = Math.floor(100000 + Math.random() * 900000);
-        user.verificationCode = OTP;
-        user.verificationCodeExpiresAt = Date.now() + 60 * 1000;
-        await user.save();
-        await sendVerificationEmail(user.email, OTP, 3);
-        
+        await authServices.resendOTP(_id);
         return res.status(200).json({ message: "OTP sent successfully" });
 
     } catch (error) {
